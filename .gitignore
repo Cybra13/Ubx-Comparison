@@ -1,0 +1,9 @@
+env
+.DS_Store
+.vscode
+.github
+compare_data_ori.py
+raw_data/*.ubx
+transfered_data
+processed_data
+compared_data
