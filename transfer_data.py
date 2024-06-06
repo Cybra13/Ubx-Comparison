@@ -16,6 +16,8 @@ source_dir = 'raw_data/'
 target_dir = 'transfered_data/'
 
 for file in os.listdir(source_dir):
+    if file.startswith(".git"):
+        continue
     if file.endswith('.ubx'):
         if file[:-4] + ".txt" in os.listdir(target_dir):
             print(f"Skipping {file}...")
