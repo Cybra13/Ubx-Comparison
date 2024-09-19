@@ -11,6 +11,8 @@ class Signal:
         
 frame = []
 data = []
+GNSSIDs = ["BeiDou", "GLONASS", "GPS", "Galileo", "QZSS", "SBAS"]
+
 
 source_dir = 'raw_data/'
 target_dir = 'transfered_data/'
@@ -23,18 +25,18 @@ for file in os.listdir(source_dir):
             print(f"Skipping {file}...")
             continue
         with open(source_dir + file, 'rb') as stream:
+            sigsat = 0
             print(f"Processing {file}...")
             ubr = UBXReader(stream , protfilter = 2)
             data = []
-            i = 0
-            for (raw_data, parsed_data) in ubr:
-                i += 1
+            for raw_data, parsed_data in ubr:
                 frame = []
                 try:
                     parsed_data.identity
                 except AttributeError:
                     continue
                 if parsed_data.identity == "NAV-SIG":
+                    sigsat = 1
                     data_items = str(parsed_data).strip('<>').split(', ')
                     for item in data_items:
                         try:
@@ -55,7 +57,8 @@ for file in os.listdir(source_dir):
                             case 'cno':
                                 signal.cno = val
                                 frame.append(signal)
-                if parsed_data.identity == "NAV-SAT":
+                if parsed_data.identity == "NAV-SAT" and sigsat <= 0:
+                    sigsat = -1
                     data_items = str(parsed_data).strip('<>').split(', ')
                     signal = None
                     if len(data_items) == 1:
@@ -82,4 +85,6 @@ for file in os.listdir(source_dir):
     # write all the gnssId, svId, sigId, cno to file
         for frame in data:
             for signal in frame:
+                if signal.gnssId not in GNSSIDs:
+                    continue
                 f.write(f"{signal.gnssId}, {signal.svId}, {signal.sigId}, {signal.cno}\n")

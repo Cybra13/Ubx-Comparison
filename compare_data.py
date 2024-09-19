@@ -5,6 +5,33 @@ import xlsxwriter
 source_dir = 'processed_data/'
 target_dir = 'compared_data/'
 
+def map_signal(system, signal): # mapping signals
+    mapping = {
+        "BeiDou": {
+            0: "B1D1",
+            7: "B2Ap"
+        },
+        "GLONASS": {
+            0: "L1OF"
+        },
+        "GPS": {
+            0: "L1C/A",
+            7: "L5Q"
+        },
+        "Galileo": {
+            0: "E1C",
+            4: "E5AQ"
+        },
+        "QZSS": {
+            0: "L1C/A",
+            9: "L5Q"
+        },
+        "SBAS": {
+            0: "L1C/A"
+        }
+    }
+    return mapping.get(system, {}).get(signal, "Unknown")
+
 # Get a list of all files in the source directory
 files = os.listdir(source_dir)
 files.sort()
@@ -86,6 +113,8 @@ for prefix, files in data_dict.items():
                     worksheet.write(i + 1, j, item[0])
                     worksheet.write(i + 1, j + 1, item[1])
                     worksheet.write(i + 1, j + 2, item[2])
+                    worksheet.write(i + 1, j + 2, map_signal(item[0], item[2]))
+
                 else:
                     if item == -1:
                         # worksheet.write(i + 1, j + 2, 0)
