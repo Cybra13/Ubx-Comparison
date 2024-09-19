@@ -3,6 +3,7 @@ env
 .vscode
 .github
 compare_data_ori.py
-transfered_data
-processed_data
-compared_data
+raw_data/*
+transfered_data/*
+processed_data/*
+compared_data/*
