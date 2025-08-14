@@ -1,5 +1,6 @@
 env
 .DS_Store
+__pycache__
 .vscode
 .github
 compare_data_ori.py

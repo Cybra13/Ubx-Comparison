@@ -2,6 +2,68 @@ from pyubx2 import UBXReader
 from pyubx2 import UBXMessage
 import os
 
+def map_signal(system, signal): # mapping signals
+    mapping = {
+        "BeiDou": {
+            0: "B1I",
+            1: "B1Q",
+            2: "B1C",
+            3: "B2I",
+            4: "B2Q",
+            5: "B2aI",
+            6: "B2aQ",
+            7: "B2bI",
+            8: "B2bQ",
+            9: "B3I",
+            10: "B3Q"
+        },
+        "GLONASS": {
+            0: "L1OF",
+            1: "L1OC",
+            2: "L2OF",
+            3: "L2OC",
+            4: "L3OF",
+            5: "L3OC"
+        },
+        "GPS": {
+            0: "L1C/A",
+            1: "L1C",
+            2: "L2C",
+            3: "L2P",
+            4: "L5I",
+            5: "L5Q",
+            6: "L5X"
+        },
+        "Galileo": {
+            0: "E1B",
+            1: "E1C",
+            2: "E5aI",
+            3: "E5aQ",
+            4: "E5bI",
+            5: "E5bQ",
+            6: "E5I",
+            7: "E5Q",
+            8: "E6B",
+            9: "E6C"
+        },
+        "QZSS": {
+            0: "L1C/A",
+            1: "L1C",
+            2: "L2C",
+            3: "L5I",
+            4: "L5Q",
+            5: "L5X",
+            6: "L6D",
+            7: "L6E"
+        },
+        "SBAS": {
+            0: "L1C/A",
+            1: "L5I",
+            2: "L5Q"
+        }
+    }
+    return mapping.get(system, {}).get(signal, "Unknown")
+
 class Signal:
     def __init__(self, gnssId):
         self.gnssId = gnssId
@@ -30,6 +92,8 @@ for file in os.listdir(source_dir):
             ubr = UBXReader(stream , protfilter = 2)
             data = []
             for raw_data, parsed_data in ubr:
+                print(parsed_data)
+                print(parsed_data.identity)
                 frame = []
                 try:
                     parsed_data.identity
@@ -87,4 +151,5 @@ for file in os.listdir(source_dir):
             for signal in frame:
                 if signal.gnssId not in GNSSIDs:
                     continue
-                f.write(f"{signal.gnssId}, {signal.svId}, {signal.sigId}, {signal.cno}\n")
+                signal_name = map_signal(signal.gnssId, int(signal.sigId))
+                f.write(f"{signal.gnssId}, {signal.svId}, {signal_name}, {signal.cno}\n")
